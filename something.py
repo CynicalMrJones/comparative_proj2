@@ -181,7 +181,13 @@ def updateVar(var, value):
 
 def getVarValue(var, val):
     global varMap
-    print('TODO')
+    global expValue
+    test = varMap.get(var)
+    if var == test:
+        return True
+    else:
+        expValue = -1
+        return False
 
 
 def stmtList():
@@ -202,11 +208,11 @@ def stmt(file):
         lex(file)
         if nextToken == Token.ASSIGN_OP:
             lex(file)
-            expValue = expr()
+            expValue = expr(file)
             updateVar()
     elif nextToken == Token.PRINT.value:
         lex()
-        expValue = expr()
+        expValue = expr(file)
         if nextToken == Token.SEMI_COLON.value:
             print(f'>>> {expValue}')
 
@@ -216,14 +222,14 @@ def stmt(file):
         print('Stmt():missing ";".')
 
 
-def expr():
-    ret1 = term()
-
+def expr(file):
+    global nextToken
+    ret1 = term(file)
     while (nextToken == Token.ADD_OP.value or
            nextToken == Token.SUB_OP.value):
         token = nextToken
         lex()
-        ret2 = term()
+        ret2 = term(file)
         if token == Token.ADD_OP.value:
             ret1 += ret2
         else:
@@ -232,19 +238,46 @@ def expr():
     return ret1
 
 
-def term():
-    ret1 = factor()
+def term(file):
+    global nextToken
+    ret1 = factor(file)
     while (nextToken == Token.MUL_OP.value or
            nextToken == Token.DIV_OP.value):
         token = nextToken
         lex()
-        ret2 = factor()
+        ret2 = factor(file)
         if token == Token.MUL_OP.value:
             ret1 = ret1 * ret2
         else:
             ret1 = ret1 / ret2
 
     return ret1
+
+
+def factor(file):
+    global nextToken
+    global lexeme
+    global expValue
+    if (nextToken == Token.IDENT.value or nextToken == Token.INT_LIT.value):
+        var = lexeme
+        token = nextToken
+        if token == Token.IDNET.value:
+            if not getVarValue(var, expValue):
+                print(f'factor() point 3: The Identifier {var} is not defined')
+        else:
+            expValue = int(var)
+        lex(file)
+    else:
+        if (nextToken == Token.LEFT_PAREN.value):
+            lex(file)
+            expValue = expr(file)
+            if nextToken == Token.RIGHT_PAREN.value:
+                lex(file)
+            else:
+                print('factor() point 1')
+        else:
+            print('factor() point 2')
+    return expValue
 
 
 if __name__ == "__main__":
