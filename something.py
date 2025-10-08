@@ -181,7 +181,70 @@ def updateVar(var, value):
 
 def getVarValue(var, val):
     global varMap
-     it = varMap.get(var)
+    print('TODO')
+
+
+def stmtList():
+    global nextToken
+    if nextToken == -1:
+        print(">>> Empty .tiny file.")
+    else:
+        while nextToken != -1:
+            stmt()
+
+
+def stmt(file):
+    global nextToken
+    global lexeme
+    global expValue
+    if nextToken == Token.IDENT.value:
+        var = lexeme
+        lex(file)
+        if nextToken == Token.ASSIGN_OP:
+            lex(file)
+            expValue = expr()
+            updateVar()
+    elif nextToken == Token.PRINT.value:
+        lex()
+        expValue = expr()
+        if nextToken == Token.SEMI_COLON.value:
+            print(f'>>> {expValue}')
+
+    if nextToken == Token.SEMI_COLON.value:
+        lex()
+    else:
+        print('Stmt():missing ";".')
+
+
+def expr():
+    ret1 = term()
+
+    while (nextToken == Token.ADD_OP.value or
+           nextToken == Token.SUB_OP.value):
+        token = nextToken
+        lex()
+        ret2 = term()
+        if token == Token.ADD_OP.value:
+            ret1 += ret2
+        else:
+            ret1 = ret1 - ret2
+
+    return ret1
+
+
+def term():
+    ret1 = factor()
+    while (nextToken == Token.MUL_OP.value or
+           nextToken == Token.DIV_OP.value):
+        token = nextToken
+        lex()
+        ret2 = factor()
+        if token == Token.MUL_OP.value:
+            ret1 = ret1 * ret2
+        else:
+            ret1 = ret1 / ret2
+
+    return ret1
 
 
 if __name__ == "__main__":
