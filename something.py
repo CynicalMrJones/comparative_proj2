@@ -44,6 +44,7 @@ def main():
         print("File was not found")
     getChar(file)
     lex(file)
+    stmtList()
 
 
 def getChar(file):
@@ -79,8 +80,10 @@ def addChar():
     global lexeme
     global nextChar
     if lexLen <= 98:
-        lexeme[lexLen + 1] = nextChar
-        lexeme[lexLen] = 0
+        lexLen += 1
+        # lexeme[lexLen] = nextChar
+        lexeme.insert(lexLen, nextChar)
+        lexeme.insert(lexLen, 0)
     else:
         print("Error lexeme is too long")
 
