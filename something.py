@@ -42,15 +42,20 @@ def main():
         file = open(sys.argv[1], "r")
     except FileNotFoundError:
         print("File was not found")
+    # Prints array
+    # test = file.read()
+    # print(test)
     getChar(file)
     lex(file)
-    stmtList()
+    stmtList(file)
 
 
+# looks good to go
 def getChar(file):
     global nextChar
     global charClass
     nextChar = file.read(1)
+    print(nextChar)
     if not nextChar:
         return 0
     if nextChar.isalpha():
@@ -83,18 +88,18 @@ def addChar():
         lexLen += 1
         # lexeme[lexLen] = nextChar
         lexeme.insert(lexLen, nextChar)
-        lexeme.insert(lexLen, 0)
+        lexeme.insert(lexLen, '\0')
     else:
         print("Error lexeme is too long")
 
 
 def isPrint():
     global lexeme
-    if (lexeme[0] == 'P' and
-        lexeme[1] == 'R' and
-        lexeme[2] == 'I' and
-        lexeme[3] == 'N' and
-        lexeme[4] == 'T' and
+    if (lexeme[0] == 'p' and
+        lexeme[1] == 'r' and
+        lexeme[2] == 'i' and
+        lexeme[3] == 'n' and
+        lexeme[4] == 't' and
         lexeme[5] == '\0'):
         return True
     else:
@@ -139,6 +144,7 @@ def lex(file):
     global nextToken
     global charClass
     global strStmt
+    global nextChar
     lexLen = 0
     getNonBlank(file)
     match charClass:
@@ -168,8 +174,9 @@ def lex(file):
             lexeme[0] = 'E'
             lexeme[1] = 'O'
             lexeme[2] = 'F'
-            lexeme[3] = 0
-    strStmt += lexeme
+            lexeme[3] = '\0'
+    # strStmt += lexeme
+    strStmt.join(lexeme)
     strStmt += " "
     if nextToken == Token.SEMI_COLON.value:
         print(f"{strStmt}")
@@ -193,26 +200,26 @@ def getVarValue(var, val):
         return False
 
 
-def stmtList():
+def stmtList(file):
     global nextToken
     if nextToken == -1:
         print(">>> Empty .tiny file.")
     else:
         while nextToken != -1:
-            stmt()
+            stmt(file)
 
 
 def stmt(file):
     global nextToken
     global lexeme
     global expValue
-    if nextToken == Token.IDENT.value:
+    if nextToken == Token.IDNET.value:
         var = lexeme
         lex(file)
         if nextToken == Token.ASSIGN_OP:
             lex(file)
             expValue = expr(file)
-            updateVar()
+            updateVar(var, expValue)
     elif nextToken == Token.PRINT.value:
         lex()
         expValue = expr(file)
@@ -220,7 +227,7 @@ def stmt(file):
             print(f'>>> {expValue}')
 
     if nextToken == Token.SEMI_COLON.value:
-        lex()
+        lex(file)
     else:
         print('Stmt():missing ";".')
 
