@@ -55,7 +55,7 @@ def getChar(file):
     global nextChar
     global charClass
     nextChar = file.read(1)
-    print(nextChar)
+    print(f"This is the nextChar from getChar: {nextChar}")
     if not nextChar:
         return 0
     if nextChar.isalpha():
@@ -64,6 +64,7 @@ def getChar(file):
         charClass = Characters.DIGIT.value
     else:
         charClass = Characters.UNKNOWN.value
+        print(f"This is the charClass from getChar: {charClass}")
 
 
 def isspace(file):
@@ -108,6 +109,7 @@ def isPrint():
 
 def lookup(char):
     global nextToken
+    print(char)
     match char:
         case '(':
             addChar()
@@ -167,6 +169,7 @@ def lex(file):
                 getChar(file)
             nextToken = Token.INT_LIT.value
         case Characters.UNKNOWN.value:
+            print(f'looking up nextChar{nextChar}')
             lookup(nextChar)
             getChar(file)
         case EOF:
@@ -177,7 +180,7 @@ def lex(file):
             lexeme[3] = '\0'
     # strStmt += lexeme
     strStmt.join(lexeme)
-    strStmt += " "
+    strStmt + " "
     if nextToken == Token.SEMI_COLON.value:
         print(f"{strStmt}")
         strStmt = ""
@@ -209,10 +212,12 @@ def stmtList(file):
             stmt(file)
 
 
+# Something is wrong here CHECK ME
 def stmt(file):
     global nextToken
     global lexeme
     global expValue
+
     if nextToken == Token.IDNET.value:
         var = lexeme
         lex(file)
@@ -221,7 +226,7 @@ def stmt(file):
             expValue = expr(file)
             updateVar(var, expValue)
     elif nextToken == Token.PRINT.value:
-        lex()
+        lex(file)
         expValue = expr(file)
         if nextToken == Token.SEMI_COLON.value:
             print(f'>>> {expValue}')
