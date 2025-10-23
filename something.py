@@ -1,6 +1,7 @@
 
 from enum import Enum
 import sys
+# Look into iterators
 
 
 class Characters(Enum):
@@ -14,13 +15,14 @@ class Token(Enum):
     IDNET = 11
     ASSIGN_OP = 20
     ADD_OP = 21
-    SUB_OP = 21
+    SUB_OP = 22
     MULT_OP = 23
     DIV_OP = 24
     LEFT_PAREN = 25
     RIGHT_PAREN = 26
     SEMI_COLON = 27
     PRINT = 28
+    EOF = -1
 
 
 charClass = int()
@@ -96,12 +98,7 @@ def addChar():
 
 def isPrint():
     global lexeme
-    if (lexeme[0] == 'p' and
-        lexeme[1] == 'r' and
-        lexeme[2] == 'i' and
-        lexeme[3] == 'n' and
-        lexeme[4] == 't' and
-        lexeme[5] == '\0'):
+    if lexeme == 'print':
         return True
     else:
         return False
@@ -147,6 +144,7 @@ def lex(file):
     global charClass
     global strStmt
     global nextChar
+    lexeme = ""
     lexLen = 0
     getNonBlank(file)
     match charClass:
@@ -187,6 +185,7 @@ def lex(file):
     return nextToken
 
 
+# correct function
 def updateVar(var, value):
     global varMap
     varMap[var] = value
@@ -218,6 +217,7 @@ def stmt(file):
     global lexeme
     global expValue
 
+    print(f"This is the nextToken in stmt(): {nextToken}")
     if nextToken == Token.IDNET.value:
         var = lexeme
         lex(file)
@@ -243,7 +243,7 @@ def expr(file):
     while (nextToken == Token.ADD_OP.value or
            nextToken == Token.SUB_OP.value):
         token = nextToken
-        lex()
+        lex(file)
         ret2 = term(file)
         if token == Token.ADD_OP.value:
             ret1 += ret2
@@ -259,7 +259,7 @@ def term(file):
     while (nextToken == Token.MUL_OP.value or
            nextToken == Token.DIV_OP.value):
         token = nextToken
-        lex()
+        lex(file)
         ret2 = factor(file)
         if token == Token.MUL_OP.value:
             ret1 = ret1 * ret2
