@@ -1,28 +1,25 @@
 
-from enum import Enum
 import sys
 # Look into iterators
 
 
-class Characters(Enum):
-    LETTER = 0
-    DIGIT = 1
-    UNKNOWN = 99
+LETTER = 0
+DIGIT = 1
+UNKNOWN = 99
 
 
-class Token(Enum):
-    INT_LIT = 10
-    IDNET = 11
-    ASSIGN_OP = 20
-    ADD_OP = 21
-    SUB_OP = 22
-    MULT_OP = 23
-    DIV_OP = 24
-    LEFT_PAREN = 25
-    RIGHT_PAREN = 26
-    SEMI_COLON = 27
-    PRINT = 28
-    EOF = -1
+INT_LIT = 10
+IDNET = 11
+ASSIGN_OP = 20
+ADD_OP = 21
+SUB_OP = 22
+MULT_OP = 23
+DIV_OP = 24
+LEFT_PAREN = 25
+RIGHT_PAREN = 26
+SEMI_COLON = 27
+PRINT = 28
+EOF = -1
 
 
 charClass = int()
@@ -61,11 +58,11 @@ def getChar(file):
     if not nextChar:
         return 0
     if nextChar.isalpha():
-        charClass = Characters.LETTER.value
+        charClass = LETTER
     elif nextChar.isdigit():
-        charClass = Characters.DIGIT.value
+        charClass = DIGIT
     else:
-        charClass = Characters.UNKNOWN.value
+        charClass = UNKNOWN
         print(f"This is the charClass from getChar: {charClass}")
 
 
@@ -110,28 +107,28 @@ def lookup(char):
     match char:
         case '(':
             addChar()
-            nextToken = Token.LEFT_PAREN.value
+            nextToken = LEFT_PAREN
         case ')':
             addChar()
-            nextToken = Token.RIGHT_PAREN.value
+            nextToken = RIGHT_PAREN
         case '+':
             addChar()
-            nextToken = Token.ADD_OP.value
+            nextToken = ADD_OP
         case '-':
             addChar()
-            nextToken = Token.SUB_OP.value
+            nextToken = SUB_OP
         case '*':
             addChar()
-            nextToken = Token.MULT_OP.value
+            nextToken = MULT_OP
         case '/':
             addChar()
-            nextToken = Token.DIV_OP.value
+            nextToken = DIV_OP
         case '=':
             addChar()
-            nextToken = Token.ASSIGN_OP.value
+            nextToken = ASSIGN_OP
         case ';':
             addChar()
-            nextToken = Token.SEMI_COLON.value
+            nextToken = SEMI_COLON
         case _:
             addChar()
             nextToken = -1
@@ -148,38 +145,37 @@ def lex(file):
     lexLen = 0
     getNonBlank(file)
     match charClass:
-        case Characters.LETTER.value:
+        case LETTER:
             addChar()
             getChar(file)
-            while (charClass == Characters.LETTER.value or
-                   charClass == Characters.DIGIT.value):
+            while (charClass == LETTER or
+                   charClass == DIGIT):
                 addChar()
                 getChar(file)
             if isPrint():
-                nextToken = Token.PRINT.value
+                nextToken = PRINT
             else:
-                nextToken = Token.IDNET.value
-        case Characters.DIGIT.value:
+                nextToken = IDNET
+        case DIGIT:
             addChar()
             getChar(file)
-            while charClass == Characters.DIGIT.value:
+            while charClass == DIGIT:
                 addChar()
                 getChar(file)
-            nextToken = Token.INT_LIT.value
-        case Characters.UNKNOWN.value:
+            nextToken = INT_LIT
+        case UNKNOWN:
             print(f'looking up nextChar{nextChar}')
             lookup(nextChar)
             getChar(file)
         case EOF:
             nextToken = EOF
-            lexeme[0] = 'E'
-            lexeme[1] = 'O'
-            lexeme[2] = 'F'
-            lexeme[3] = '\0'
+            lexeme[0] = 'e'
+            lexeme[1] = 'o'
+            lexeme[2] = 'f'
     # strStmt += lexeme
     strStmt.join(lexeme)
     strStmt + " "
-    if nextToken == Token.SEMI_COLON.value:
+    if nextToken == SEMI_COLON:
         print(f"{strStmt}")
         strStmt = ""
     return nextToken
@@ -218,20 +214,20 @@ def stmt(file):
     global expValue
 
     print(f"This is the nextToken in stmt(): {nextToken}")
-    if nextToken == Token.IDNET.value:
+    if nextToken == IDNET:
         var = lexeme
         lex(file)
-        if nextToken == Token.ASSIGN_OP:
+        if nextToken == ASSIGN_OP:
             lex(file)
             expValue = expr(file)
             updateVar(var, expValue)
-    elif nextToken == Token.PRINT.value:
+    elif nextToken == PRINT:
         lex(file)
         expValue = expr(file)
-        if nextToken == Token.SEMI_COLON.value:
+        if nextToken == SEMI_COLON:
             print(f'>>> {expValue}')
 
-    if nextToken == Token.SEMI_COLON.value:
+    if nextToken == SEMI_COLON:
         lex(file)
     else:
         print('Stmt():missing ";".')
@@ -240,12 +236,12 @@ def stmt(file):
 def expr(file):
     global nextToken
     ret1 = term(file)
-    while (nextToken == Token.ADD_OP.value or
-           nextToken == Token.SUB_OP.value):
+    while (nextToken == ADD_OP or
+           nextToken == SUB_OP):
         token = nextToken
         lex(file)
         ret2 = term(file)
-        if token == Token.ADD_OP.value:
+        if token == ADD_OP:
             ret1 += ret2
         else:
             ret1 = ret1 - ret2
@@ -256,12 +252,12 @@ def expr(file):
 def term(file):
     global nextToken
     ret1 = factor(file)
-    while (nextToken == Token.MUL_OP.value or
-           nextToken == Token.DIV_OP.value):
+    while (nextToken == MULT_OP or
+           nextToken == DIV_OP):
         token = nextToken
         lex(file)
         ret2 = factor(file)
-        if token == Token.MUL_OP.value:
+        if token == MULT_OP:
             ret1 = ret1 * ret2
         else:
             ret1 = ret1 / ret2
@@ -273,20 +269,20 @@ def factor(file):
     global nextToken
     global lexeme
     global expValue
-    if (nextToken == Token.IDENT.value or nextToken == Token.INT_LIT.value):
+    if (nextToken == IDNET or nextToken == INT_LIT):
         var = lexeme
         token = nextToken
-        if token == Token.IDNET.value:
+        if token == IDNET:
             if not getVarValue(var, expValue):
                 print(f'factor() point 3: The Identifier {var} is not defined')
         else:
             expValue = int(var)
         lex(file)
     else:
-        if (nextToken == Token.LEFT_PAREN.value):
+        if (nextToken == LEFT_PAREN):
             lex(file)
             expValue = expr(file)
-            if nextToken == Token.RIGHT_PAREN.value:
+            if nextToken == RIGHT_PAREN:
                 lex(file)
             else:
                 print('factor() point 1')
