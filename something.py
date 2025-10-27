@@ -176,7 +176,8 @@ def getVarValue(var, val):
     global varMap
     global expValue
     it = varMap.get(var)
-    if var == it:
+    if it:
+        expValue = it
         return True
     else:
         expValue = -1
@@ -254,10 +255,12 @@ def factor(file):
     global lexeme
     global expValue
     if (nextToken == Token.IDENT.value or nextToken == Token.INT_LIT.value):
-        var = lexeme
+        var = ''
+        for c in lexeme:
+            var += c
         token = nextToken
         if token == Token.IDENT.value:
-            if not getVarValue(var, expValue):
+            if not (getVarValue(var, expValue)):
                 print(f'factor() point 3: The Identifier {var} is not defined')
         else:
             expValue = int(var)
