@@ -12,7 +12,7 @@ class Characters(Enum):
 
 class Token(Enum):
     INT_LIT = 10
-    IDNET = 11
+    IDENT = 11
     ASSIGN_OP = 20
     ADD_OP = 21
     SUB_OP = 22
@@ -69,17 +69,9 @@ def getChar(file):
         print(f"This is the charClass from getChar: {charClass}")
 
 
-def isspace(file):
-    global nextChar
-    if nextChar == ' ':
-        return True
-    else:
-        return False
-
-
 def getNonBlank(file):
     global nextChar
-    while isspace(nextChar):
+    while nextChar.isspace():
         getChar(file)
 
 
@@ -90,8 +82,9 @@ def addChar():
     if lexLen <= 98:
         lexLen += 1
         # lexeme[lexLen] = nextChar
-        lexeme.insert(lexLen, nextChar)
-        lexeme.insert(lexLen, '\0')
+        # lexeme.insert(lexLen, nextChar)
+        lexeme += nextChar
+        print(f"This is lexeme in addChar: {lexeme}")
     else:
         print("Error lexeme is too long")
 
@@ -144,43 +137,39 @@ def lex(file):
     global charClass
     global strStmt
     global nextChar
+    global lexeme
     lexeme = ""
     lexLen = 0
     getNonBlank(file)
-    match charClass:
-        case Characters.LETTER.value:
+    if charClass == Characters.LETTER.value:
+        addChar()
+        getChar(file)
+        while (charClass == Characters.LETTER.value or
+               charClass == Characters.DIGIT.value):
             addChar()
             getChar(file)
-            while (charClass == Characters.LETTER.value or
-                   charClass == Characters.DIGIT.value):
-                addChar()
-                getChar(file)
-            if isPrint():
-                nextToken = Token.PRINT.value
-            else:
-                nextToken = Token.IDNET.value
-        case Characters.DIGIT.value:
+        if isPrint():
+            nextToken = Token.PRINT.value
+        else:
+            nextToken = Token.IDENT.value
+    elif charClass == Characters.DIGIT.value:
+        addChar()
+        getChar(file)
+        while charClass == Characters.DIGIT.value:
             addChar()
             getChar(file)
-            while charClass == Characters.DIGIT.value:
-                addChar()
-                getChar(file)
-            nextToken = Token.INT_LIT.value
-        case Characters.UNKNOWN.value:
-            print(f'looking up nextChar{nextChar}')
-            lookup(nextChar)
-            getChar(file)
-        case EOF:
-            nextToken = EOF
-            lexeme[0] = 'E'
-            lexeme[1] = 'O'
-            lexeme[2] = 'F'
-            lexeme[3] = '\0'
-    # strStmt += lexeme
-    strStmt.join(lexeme)
-    strStmt + " "
+        nextToken = Token.INT_LIT.value
+    elif charClass == Characters.UNKNOWN.value:
+        lookup(nextChar)
+        getChar(file)
+    elif charClass == Token.EOF.value:
+        nextToken = Token.EOF.value
+        lexeme = 'EOF'
+    for c in lexeme:
+        strStmt += c
+        print(strStmt)
     if nextToken == Token.SEMI_COLON.value:
-        print(f"{strStmt}")
+        print(strStmt)
         strStmt = ""
     return nextToken
 
@@ -194,8 +183,8 @@ def updateVar(var, value):
 def getVarValue(var, val):
     global varMap
     global expValue
-    test = varMap.get(var)
-    if var == test:
+    it = varMap.get(var)
+    if var == it:
         return True
     else:
         expValue = -1
@@ -204,10 +193,10 @@ def getVarValue(var, val):
 
 def stmtList(file):
     global nextToken
-    if nextToken == -1:
+    if nextToken == Token.EOF.value:
         print(">>> Empty .tiny file.")
     else:
-        while nextToken != -1:
+        while nextToken != Token.EOF.value:
             stmt(file)
 
 
@@ -218,7 +207,7 @@ def stmt(file):
     global expValue
 
     print(f"This is the nextToken in stmt(): {nextToken}")
-    if nextToken == Token.IDNET.value:
+    if nextToken == Token.IDENT.value:
         var = lexeme
         lex(file)
         if nextToken == Token.ASSIGN_OP:
@@ -246,7 +235,7 @@ def expr(file):
         lex(file)
         ret2 = term(file)
         if token == Token.ADD_OP.value:
-            ret1 += ret2
+            ret1 = ret1 + ret2
         else:
             ret1 = ret1 - ret2
 
@@ -256,12 +245,12 @@ def expr(file):
 def term(file):
     global nextToken
     ret1 = factor(file)
-    while (nextToken == Token.MUL_OP.value or
+    while (nextToken == Token.MULT_OP.value or
            nextToken == Token.DIV_OP.value):
         token = nextToken
         lex(file)
         ret2 = factor(file)
-        if token == Token.MUL_OP.value:
+        if token == Token.MULT_OP.value:
             ret1 = ret1 * ret2
         else:
             ret1 = ret1 / ret2
@@ -276,7 +265,7 @@ def factor(file):
     if (nextToken == Token.IDENT.value or nextToken == Token.INT_LIT.value):
         var = lexeme
         token = nextToken
-        if token == Token.IDNET.value:
+        if token == Token.IDENT.value:
             if not getVarValue(var, expValue):
                 print(f'factor() point 3: The Identifier {var} is not defined')
         else:
