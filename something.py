@@ -44,9 +44,6 @@ def main():
         file = open(sys.argv[1], "r")
     except FileNotFoundError:
         print("File was not found")
-    # Prints array
-    # test = file.read()
-    # print(test)
     getChar(file)
     lex(file)
     stmtList(file)
@@ -57,7 +54,6 @@ def getChar(file):
     global nextChar
     global charClass
     nextChar = file.read(1)
-    print(f"This is the nextChar from getChar: {nextChar}")
     if not nextChar:
         return 0
     if nextChar.isalpha():
@@ -66,7 +62,6 @@ def getChar(file):
         charClass = Characters.DIGIT.value
     else:
         charClass = Characters.UNKNOWN.value
-        print(f"This is the charClass from getChar: {charClass}")
 
 
 def getNonBlank(file):
@@ -84,7 +79,6 @@ def addChar():
         # lexeme[lexLen] = nextChar
         # lexeme.insert(lexLen, nextChar)
         lexeme += nextChar
-        print(f"This is lexeme in addChar: {lexeme}")
     else:
         print("Error lexeme is too long")
 
@@ -99,7 +93,6 @@ def isPrint():
 
 def lookup(char):
     global nextToken
-    print(char)
     match char:
         case '(':
             addChar()
@@ -167,7 +160,6 @@ def lex(file):
         lexeme = 'EOF'
     for c in lexeme:
         strStmt += c
-        print(strStmt)
     if nextToken == Token.SEMI_COLON.value:
         print(strStmt)
         strStmt = ""
@@ -206,11 +198,10 @@ def stmt(file):
     global lexeme
     global expValue
 
-    print(f"This is the nextToken in stmt(): {nextToken}")
     if nextToken == Token.IDENT.value:
         var = lexeme
         lex(file)
-        if nextToken == Token.ASSIGN_OP:
+        if nextToken == Token.ASSIGN_OP.value:
             lex(file)
             expValue = expr(file)
             updateVar(var, expValue)
