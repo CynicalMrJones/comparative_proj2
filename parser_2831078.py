@@ -76,8 +76,6 @@ def addChar():
     global nextChar
     if lexLen <= 98:
         lexLen += 1
-        # lexeme[lexLen] = nextChar
-        # lexeme.insert(lexLen, nextChar)
         lexeme += nextChar
     else:
         print("Error lexeme is too long")
@@ -160,6 +158,7 @@ def lex(file):
         lexeme = 'EOF'
     for c in lexeme:
         strStmt += c
+        strStmt += ' '
     if nextToken == Token.SEMI_COLON.value:
         print(strStmt)
         strStmt = ""
