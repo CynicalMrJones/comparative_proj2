@@ -91,34 +91,33 @@ def isPrint():
 
 def lookup(char):
     global nextToken
-    match char:
-        case '(':
-            addChar()
-            nextToken = Token.LEFT_PAREN.value
-        case ')':
-            addChar()
-            nextToken = Token.RIGHT_PAREN.value
-        case '+':
-            addChar()
-            nextToken = Token.ADD_OP.value
-        case '-':
-            addChar()
-            nextToken = Token.SUB_OP.value
-        case '*':
-            addChar()
-            nextToken = Token.MULT_OP.value
-        case '/':
-            addChar()
-            nextToken = Token.DIV_OP.value
-        case '=':
-            addChar()
-            nextToken = Token.ASSIGN_OP.value
-        case ';':
-            addChar()
-            nextToken = Token.SEMI_COLON.value
-        case _:
-            addChar()
-            nextToken = -1
+    if char == '(':
+        addChar()
+        nextToken = Token.LEFT_PAREN.value
+    elif char == ')':
+        addChar()
+        nextToken = Token.RIGHT_PAREN.value
+    elif char == '+':
+        addChar()
+        nextToken = Token.ADD_OP.value
+    elif char == '-':
+        addChar()
+        nextToken = Token.SUB_OP.value
+    elif char == '*':
+        addChar()
+        nextToken = Token.MULT_OP.value
+    elif char == '/':
+        addChar()
+        nextToken = Token.DIV_OP.value
+    elif char == '=':
+        addChar()
+        nextToken = Token.ASSIGN_OP.value
+    elif char == ';':
+        addChar()
+        nextToken = Token.SEMI_COLON.value
+    else:
+        addChar()
+        nextToken = -1
     return nextToken
 
 
